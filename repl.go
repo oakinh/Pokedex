@@ -23,7 +23,7 @@ func startRepl() {
 		} else {
 			err := command.callback()
 			if err != nil {
-				fmt.Println("Error", err)
+				fmt.Println("Error:", err)
 			}
 		}
 		fmt.Print("Pokedex > ")
@@ -50,6 +50,16 @@ func getCommands() map[string]cliCommand {
 			name:        "exit",
 			description: "Exit the Pokedex",
 			callback:    commandExit,
+		},
+		"map": {
+			name:        "map",
+			description: "Displays the next 20 location areas of the game map",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "map",
+			description: "Displays the previous 20 location areas of the game map",
+			callback:    commandMapb,
 		},
 	}
 }
