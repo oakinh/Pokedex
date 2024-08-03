@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func requestLocations(id int) string {
+func RequestLocations(id int) string {
 	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%d/", id)
 	response, err := http.Get(url)
 	if err != nil {

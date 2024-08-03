@@ -57,7 +57,7 @@ func getCommands() map[string]cliCommand {
 			callback:    commandMap,
 		},
 		"mapb": {
-			name:        "map",
+			name:        "mapb",
 			description: "Displays the previous 20 location areas of the game map",
 			callback:    commandMapb,
 		},
