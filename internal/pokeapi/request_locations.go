@@ -2,35 +2,37 @@ package pokeapi
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
-func RequestLocations(id int) string {
-	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%d/", id)
-	response, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	body, err := io.ReadAll(response.Body)
-	defer response.Body.Close()
-	if response.StatusCode > 299 {
-		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", response.StatusCode, body)
-	}
-	if err != nil {
-		log.Fatal(err)
-	}
-	//dat := []byte(body)
-	locationArea := LocationArea{}
-	err = json.Unmarshal(body, &locationArea)
-	if err != nil {
-		fmt.Println(err)
-	}
-	if locationArea.Name != nil && *locationArea.Name != "" {
-		return *locationArea.Name
+func (c *Client) RequestLocations(pageURL *string) (LocationArea, error) {
+	url := baseURL + "/location-area"
+	if pageURL != nil {
+		url = *pageURL
 	}
 
-	return "Unknown Location"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return LocationArea{}, err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return LocationArea{}, err
+	}
+	defer resp.Body.Close()
+
+	dat, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return LocationArea{}, err
+	}
+
+	locationsResp := LocationArea{}
+	err = json.Unmarshal(dat, &locationsResp)
+	if err != nil {
+		return LocationArea{}, err
+	}
+
+	return locationsResp, nil
 }

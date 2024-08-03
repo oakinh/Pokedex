@@ -3,31 +3,38 @@ package main
 import (
 	"errors"
 	"fmt"
-
-	"github.com/oakinh/pokedex/internal/pokeapi"
 )
 
-var mapPosition int = 1
-
-func commandMap() error {
-	for i := mapPosition; i < mapPosition+20; i++ {
-		locationName := pokeapi.RequestLocations(i)
-		fmt.Println(locationName)
+func commandMap(cfg *config) error {
+	locationsResp, err := cfg.pokeapiClient.RequestLocations(cfg.nextLocationsURL)
+	if err != nil {
+		return err
 	}
-	mapPosition += 20
+
+	cfg.nextLocationsURL = locationsResp.Next
+	cfg.prevLocationsURL = locationsResp.Previous
+
+	for _, loc := range locationsResp.Results {
+		fmt.Println(loc.Name)
+	}
 	return nil
 }
 
-func commandMapb() error {
-	if mapPosition-40 < 1 {
-		return errors.New("you cannot go back further than the first result. Please continue in the map before attempting to go back")
+func commandMapb(cfg *config) error {
+	if cfg.prevLocationsURL == nil {
+		return errors.New("you're on the first page")
 	}
-	mapPosition -= 40
-	for i := mapPosition; i < mapPosition+20; i++ {
-		locationName := pokeapi.RequestLocations(i)
-		fmt.Println(locationName)
 
+	locationResp, err := cfg.pokeapiClient.RequestLocations(cfg.prevLocationsURL)
+	if err != nil {
+		return err
 	}
-	mapPosition += 20
+
+	cfg.nextLocationsURL = locationResp.Next
+	cfg.prevLocationsURL = locationResp.Previous
+
+	for _, loc := range locationResp.Results {
+		fmt.Println(loc.Name)
+	}
 	return nil
 }
